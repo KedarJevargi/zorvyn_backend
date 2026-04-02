@@ -13,10 +13,10 @@ engine = create_async_engine(
     
     # --- Production Pool Settings ---
     pool_pre_ping=True,      # Verify connection health before usage (prevents "server closed connection" errors)
-    pool_size=20,            # Baseline number of persistent connections in the pool
-    max_overflow=10,         # Allow up to 10 additional connections during traffic bursts
-    pool_recycle=3600,       # Recycle connections every hour to prevent DB-side timeouts
-    pool_timeout=30,         # How long to wait for an available connection before throwing an error
+    pool_size=12,            # Baseline number of persistent connections in the pool
+    max_overflow=18,         # Allow up to 10 additional connections during traffic bursts
+    pool_recycle=1200,       # Recycle connections every hour to prevent DB-side timeouts
+    pool_timeout=20,         # How long to wait for an available connection before throwing an error
 )
 
 async_session = async_sessionmaker(
