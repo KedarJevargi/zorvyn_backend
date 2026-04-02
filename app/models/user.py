@@ -66,10 +66,9 @@ class User(Base):
     )
 
     records: Mapped[list["FinancialRecord"]] = relationship(
-        "FinancialRecord",
-        back_populates="user",
-        foreign_keys="[FinancialRecord.user_id]"
-    )
+    "FinancialRecord",
+    back_populates="user"
+)
 
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         "RefreshToken",
