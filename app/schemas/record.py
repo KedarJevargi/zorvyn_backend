@@ -50,6 +50,8 @@ class RecordResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+
+
 class RecordFilter(BaseModel):
     type: Optional[RecordType] = None
     category: Optional[str] = None
@@ -57,3 +59,9 @@ class RecordFilter(BaseModel):
     date_to: Optional[datetime] = None
     page: int = 1
     limit: int = 10
+
+    @field_validator("type", mode="before")
+    def strip_type(cls, v):
+        if isinstance(v, str):
+            return v.strip()
+        return v
