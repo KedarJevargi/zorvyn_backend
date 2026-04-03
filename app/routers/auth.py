@@ -1,16 +1,13 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.schemas.user import UserRegister, UserLogin, UserResponse
+from app.schemas.token import TokenResponse
 from app.services.auth_service import register_user, login_user, refresh_access_token, logout_user
 from app.core.dependencies import get_current_user
 from app.models.user import User
 
-from app.schemas.token import RefreshRequest, LogoutRequest, TokenResponse
-
 router = APIRouter(prefix="/auth", tags=["Auth"])
-
-
 
 
 @router.post("/register", response_model=UserResponse, status_code=201)
@@ -19,18 +16,34 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/login", response_model=TokenResponse)
-async def login(data: UserLogin, db: AsyncSession = Depends(get_db)):
-    return await login_user(db, data)
+async def login(data: UserLogin, response: Response, db: AsyncSession = Depends(get_db)):
+    result = await login_user(db, data)
+    response.set_cookie(
+        key="refresh_token",
+        value=result["refresh_token"],
+        httponly=True,
+        secure=False,  # set True in production with HTTPS
+        samesite="lax",
+        max_age=60 * 60 * 24 * 7  # 7 days
+    )
+    return TokenResponse(access_token=result["access_token"])
 
 
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh(data: RefreshRequest, db: AsyncSession = Depends(get_db)):
-    return await refresh_access_token(db, data.refresh_token)
+async def refresh(request: Request, db: AsyncSession = Depends(get_db)):
+    refresh_token = request.cookies.get("refresh_token")
+    if not refresh_token:
+        from fastapi import HTTPException, status
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
+    return await refresh_access_token(db, refresh_token)
 
 
 @router.post("/logout", status_code=204)
-async def logout(data: LogoutRequest, db: AsyncSession = Depends(get_db)):
-    await logout_user(db, data.refresh_token)
+async def logout(request: Request, response: Response, db: AsyncSession = Depends(get_db)):
+    refresh_token = request.cookies.get("refresh_token")
+    if refresh_token:
+        await logout_user(db, refresh_token)
+    response.delete_cookie("refresh_token")
 
 
 @router.get("/me", response_model=UserResponse)

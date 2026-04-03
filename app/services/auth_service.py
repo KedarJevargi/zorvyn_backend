@@ -28,7 +28,7 @@ async def register_user(db: AsyncSession, data: UserRegister) -> User:
     return user
 
 
-async def login_user(db: AsyncSession, data: UserLogin) -> TokenResponse:
+async def login_user(db: AsyncSession, data: UserLogin) -> dict:
     result = await db.execute(
         select(User).where(User.email == data.email, User.is_deleted == False, User.is_active == True)
     )
@@ -51,7 +51,10 @@ async def login_user(db: AsyncSession, data: UserLogin) -> TokenResponse:
     db.add(db_token)
     await db.commit()
     
-    return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+    return {
+    "access_token": access_token,
+    "refresh_token": refresh_token
+}
 
 
 async def refresh_access_token(db: AsyncSession, refresh_token: str) -> TokenResponse:
