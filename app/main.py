@@ -4,6 +4,7 @@ from app.models import user, record, refresh_token  # noqa: F401
 
 
 from app.routers.auth import router as auth_router
+from app.routers.users import router as users_router
 
 app = FastAPI(
     title="Finance Backend",
@@ -20,3 +21,4 @@ async def health_check():
 
 
 app.include_router(auth_router)
+app.include_router(users_router)

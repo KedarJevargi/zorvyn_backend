@@ -38,13 +38,15 @@ class User(Base):
     role: Mapped[UserRole] = mapped_column(
         Enum(UserRole, native_enum=False),
         default=UserRole.viewer,
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     is_active: Mapped[bool] = mapped_column(
         Boolean,
         default=True,
-        nullable=False
+        nullable=False,
+        index=True
     )
 
     is_deleted: Mapped[bool] = mapped_column(
