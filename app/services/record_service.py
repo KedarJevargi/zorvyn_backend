@@ -33,6 +33,8 @@ async def get_records(db: AsyncSession, filters: RecordFilter) -> list[Financial
         query = query.where(FinancialRecord.date >= filters.date_from)
     if filters.date_to:
         query = query.where(FinancialRecord.date <= filters.date_to)
+    if filters.search:
+        query = query.where(FinancialRecord.notes.ilike(f"%{filters.search}%"))
     
     offset = (filters.page - 1) * filters.limit
     query = query.offset(offset).limit(filters.limit)

@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from fastapi import HTTPException, status
 from app.models.user import User
 from app.models.refresh_token import RefreshToken
@@ -37,13 +37,16 @@ async def login_user(db: AsyncSession, data: UserLogin) -> TokenResponse:
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
     
+    # Delete old refresh tokens — one token per user at all times
+    await db.execute(delete(RefreshToken).where(RefreshToken.user_id == user.id))
+    
     access_token = create_access_token(subject=user.id)
     refresh_token = create_refresh_token(subject=user.id)
     
     db_token = RefreshToken(
         user_id=user.id,
         token=refresh_token,
-        expires_at=datetime.now(timezone.utc).replace(tzinfo=None)
+        expires_at=datetime.now(timezone.utc)
     )
     db.add(db_token)
     await db.commit()

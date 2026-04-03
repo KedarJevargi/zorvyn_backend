@@ -45,3 +45,32 @@ async def update_user_status(db: AsyncSession, user_id: int, is_active: bool) ->
     await db.commit()
     await db.refresh(user)
     return user
+
+from sqlalchemy import update, delete
+from app.models.refresh_token import RefreshToken
+
+async def soft_delete_user(db: AsyncSession, user_id: int) -> None:
+    user = await get_user_by_id(db, user_id)
+    user.is_deleted = True
+    user.is_active = False
+    
+    # Hard delete all refresh tokens — user will never log in again
+    await db.execute(
+        delete(RefreshToken).where(RefreshToken.user_id == user_id)
+    )
+    await db.commit()
+
+
+async def restore_user(db: AsyncSession, user_id: int) -> User:
+    result = await db.execute(
+        select(User).where(User.id == user_id, User.is_deleted == True)
+    )
+    user = result.scalar_one_or_none()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found or not deleted")
+    
+    user.is_deleted = False
+    user.is_active = True
+    await db.commit()
+    await db.refresh(user)
+    return user

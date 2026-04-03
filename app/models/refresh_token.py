@@ -24,15 +24,11 @@ class RefreshToken(Base):
         index=True
     )
 
-    expires_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        nullable=False
-    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        server_default=func.now()
-    )
+
+
 
     is_revoked: Mapped[bool] = mapped_column(
         Boolean,

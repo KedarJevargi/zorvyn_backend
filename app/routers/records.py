@@ -15,12 +15,13 @@ async def list_records(
     category: str | None = None,
     date_from: str | None = None,
     date_to: str | None = None,
+    search: str | None = None,
     page: int = 1,
     limit: int = 10,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_analyst_or_admin)
 ):
-    filters = RecordFilter(type=type, category=category, date_from=date_from, date_to=date_to, page=page, limit=limit)
+    filters = RecordFilter(type=type, category=category, date_from=date_from, date_to=date_to, search=search, page=page, limit=limit)
     return await get_records(db, filters)
 
 

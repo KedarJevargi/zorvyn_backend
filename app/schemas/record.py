@@ -57,6 +57,7 @@ class RecordFilter(BaseModel):
     category: Optional[str] = None
     date_from: Optional[datetime] = None
     date_to: Optional[datetime] = None
+    search: Optional[str] = None
     page: int = 1
     limit: int = 10
 

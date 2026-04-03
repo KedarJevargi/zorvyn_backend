@@ -3,8 +3,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.database import get_db
 from app.models.user import User, UserRole
 from app.schemas.user import UserResponse, RoleUpdateRequest, StatusUpdateRequest
-from app.services.user_service import get_all_users, get_user_by_id, update_user_role, update_user_status
-from app.core.dependencies import get_current_admin, get_current_analyst_or_admin
+from app.services.user_service import get_all_users, get_user_by_id, restore_user, soft_delete_user, update_user_role, update_user_status
+from app.core.dependencies import get_current_admin
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -47,3 +47,23 @@ async def update_status(
     current_user: User = Depends(get_current_admin)
 ):
     return await update_user_status(db, user_id, data.is_active)
+
+
+
+@router.delete("/{user_id}", status_code=204)
+async def delete_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_admin)
+):
+    await soft_delete_user(db, user_id)
+
+
+
+@router.patch("/{user_id}/restore", response_model=UserResponse)
+async def restore_deleted_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_admin)
+):
+    return await restore_user(db, user_id)
