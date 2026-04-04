@@ -4,6 +4,27 @@ A well-structured REST API for a finance dashboard system with role-based access
 
 Built with **FastAPI**, **PostgreSQL**, and **SQLAlchemy 2.0**.
 
+> System is optimized for read-heavy workloads with indexed queries and connection pooling.
+
+---
+
+## System Architecture
+```
+Client
+  │
+  ▼
+FastAPI (Routers)
+  │
+  ▼
+Services (Business Logic)
+  │
+  ▼
+SQLAlchemy ORM
+  │
+  ▼
+PostgreSQL (Docker)
+```
+
 ---
 
 ## Tech Stack
@@ -67,14 +88,15 @@ finance-backend/
 
 ### 1. Clone the repository
 ```bash
-git clone <https://github.com/KedarJevargi/zorvyn_backend.git>
+git clone <repo-url>
+cd backend
 ```
 
 ### 2. Create virtual environment
 
 **Mac/Linux:**
 ```bash
-python3 -m venv venv
+python -m venv venv
 source venv/bin/activate
 ```
 
@@ -244,8 +266,8 @@ User (1) ──────────── (many) RefreshToken
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
 | POST | /records | Create financial record | Admin |
-| GET | /records | List records with filters, search and pagination | Analyst+Admin |
-| GET | /records/{id} | Get single record | Analyst+Admin|
+| GET | /records | List records with filters, search and pagination | Analyst+ |
+| GET | /records/{id} | Get single record | Analyst+ |
 | PATCH | /records/{id} | Update record | Admin |
 | DELETE | /records/{id} | Soft delete record | Admin |
 | PATCH | /records/{id}/restore | Restore soft deleted record | Admin |
@@ -275,10 +297,132 @@ GET /dashboard/recent?limit=5
 
 ---
 
+## Request / Response Examples
+
+### Register
+```
+POST /auth/register
+{
+  "name": "Rahul Sharma",
+  "email": "rahul@example.com",
+  "password": "securepassword"
+}
+
+Response 201:
+{
+  "id": 3,
+  "name": "Rahul Sharma",
+  "email": "rahul@example.com",
+  "role": "viewer",
+  "is_active": true,
+  "is_deleted": false,
+  "created_at": "2026-04-03T10:00:00Z",
+  "updated_at": "2026-04-03T10:00:00Z"
+}
+```
+
+### Login
+```
+POST /auth/login
+{
+  "email": "admin@finance.com",
+  "password": "admin123"
+}
+
+Response 200:
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer"
+}
+# refresh_token set as HttpOnly cookie
+```
+
+### Create Record
+```
+POST /records
+Authorization: Bearer <access_token>
+{
+  "amount": 50000,
+  "type": "income",
+  "category": "salary",
+  "notes": "Monthly salary March 2026",
+  "date": "2026-03-01T00:00:00Z"
+}
+
+Response 201:
+{
+  "id": 1,
+  "user_id": 2,
+  "amount": 50000.00,
+  "type": "income",
+  "category": "salary",
+  "notes": "Monthly salary March 2026",
+  "date": "2026-03-01T00:00:00Z",
+  "is_deleted": false,
+  "created_at": "2026-04-03T10:00:00Z",
+  "updated_at": "2026-04-03T10:00:00Z"
+}
+```
+
+### Dashboard Summary
+```
+GET /dashboard/summary?date_from=2026-01-01T00:00:00Z&date_to=2026-03-31T00:00:00Z
+Authorization: Bearer <access_token>
+
+Response 200:
+{
+  "total_income": 85000.00,
+  "total_expenses": 11500.00,
+  "net_balance": 73500.00
+}
+```
+
+### Error Response Example
+```
+POST /records (as Analyst)
+Response 403:
+{
+  "detail": "Insufficient permissions"
+}
+
+POST /auth/login (wrong password)
+Response 401:
+{
+  "detail": "Invalid credentials"
+}
+```
+
+---
+
+## Validation and Error Handling
+
+- **Pydantic v2** validates all request bodies — invalid input returns `422 Unprocessable Entity` with field-level errors
+- **EmailStr** validates email format on register and login
+- **Enum validation** on `type` (income/expense) and `role` (viewer/analyst/admin)
+- **Amount validator** rejects values <= 0
+- **Category normalizer** strips whitespace and lowercases on input
+- **DB constraints** enforce `amount >= 0` and soft delete consistency at database level
+- **Consistent HTTP status codes:**
+
+| Code | Meaning |
+|---|---|
+| 200 | Success |
+| 201 | Created |
+| 204 | No content (delete/logout) |
+| 401 | Not authenticated |
+| 403 | Not authorized (wrong role) |
+| 404 | Resource not found |
+| 422 | Validation error |
+
+---
+
 ## Design Decisions
 
 **Public registration with admin role assignment**
 Anyone can register via `POST /auth/register` and gets `viewer` role by default. Admin then upgrades roles via `PATCH /users/{id}/role`. First admin is created via `seed.py` directly in the DB — avoids "first user becomes admin" race condition security risk.
+
+**Admin-only record creation**
+Designed for centralized finance systems where data entry is controlled and audited. Only trusted admins can create, update, or delete financial records. Analysts and Viewers are consumers of data, not producers.
 
 **Read-heavy system design**
 The system is read-biased — 1-2 admins write occasionally while many Viewers and Analysts constantly read dashboards and records. PostgreSQL was chosen over SQLite for its ability to handle concurrent connections cleanly.
@@ -327,6 +471,30 @@ Data model is simple and relational, not deeply nested or multi-client. REST map
 
 ---
 
+## Scalability Considerations
+
+### Current Strengths
+- Async FastAPI enables high concurrency with non-blocking I/O
+- PostgreSQL supports multi-user workloads with ACID guarantees
+- Connection pooling improves performance under load
+- Composite indexes optimize frequent dashboard queries
+- Pagination prevents large response payloads
+
+### Current Limitations
+- No caching layer — every request hits the DB directly
+- Single database instance — no read replicas
+- No rate limiting — vulnerable to abuse
+- No background jobs — all work is synchronous per request
+
+### Future Improvements
+- Redis caching for dashboard aggregation endpoints
+- Horizontal scaling with multiple FastAPI instances behind a load balancer
+- Read replicas for scaling read-heavy dashboard queries
+- Rate limiting with slowapi + Redis
+- Background workers (Celery) for heavy computations
+
+---
+
 ## Tradeoffs
 
 | Decision | Tradeoff |
@@ -358,7 +526,7 @@ Data model is simple and relational, not deeply nested or multi-client. REST map
 | Feature | Status |
 |---|---|
 | JWT Authentication + HttpOnly refresh cookie | ✅ |
-| Pagination on record listing | ✅ |
+| Pagination on record listing (max 100) | ✅ |
 | Search on notes field (PostgreSQL ILIKE) | ✅ |
 | Soft delete with restore for users and records | ✅ |
 | Auto-generated Swagger + ReDoc documentation | ✅ |
