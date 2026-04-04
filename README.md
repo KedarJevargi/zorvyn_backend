@@ -102,7 +102,7 @@ finance-backend/
 
 ### 1. Clone the repository
 ```bash
-git clone <[text](https://github.com/KedarJevargi/zorvyn_backend.git)>
+git clone <https://github.com/KedarJevargi/zorvyn_backend.git>
 cd backend
 ```
 
