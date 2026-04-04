@@ -21,35 +21,38 @@ Built with **FastAPI**, **PostgreSQL**, and **SQLAlchemy 2.0**.
 
 ---
 
-## Project Structure
-```
-app/
-├── core/
-│   ├── config.py           # Environment configuration via Pydantic Settings
-│   ├── security.py         # JWT creation, verification and password hashing
-│   └── dependencies.py     # Auth guards and role enforcement middleware
-├── models/
-│   ├── user.py             # User SQLAlchemy model
-│   ├── record.py           # FinancialRecord SQLAlchemy model
-│   └── refresh_token.py    # RefreshToken SQLAlchemy model
-├── schemas/
-│   ├── user.py             # User request/response Pydantic schemas
-│   ├── record.py           # Record request/response Pydantic schemas
-│   └── token.py            # Token response schema
-├── routers/
-│   ├── auth.py             # Authentication endpoints
-│   ├── users.py            # User management endpoints
-│   ├── records.py          # Financial record endpoints
-│   └── dashboard.py        # Analytics and summary endpoints
-├── services/
-│   ├── auth_service.py     # Auth business logic
-│   ├── user_service.py     # User management business logic
-│   ├── record_service.py   # Record CRUD business logic
-│   └── dashboard_service.py # Aggregation and analytics logic
-├── database.py             # Async SQLAlchemy engine, session and base
-└── main.py                 # FastAPI app entry point
-```
-
+zorvyn-backend/
+├── app/
+│   ├── core/
+│   │   ├── config.py             # Environment configuration via Pydantic Settings
+│   │   ├── security.py           # JWT creation, verification and password hashing
+│   │   └── dependencies.py       # Auth guards and role enforcement middleware
+│   ├── models/
+│   │   ├── user.py               # User SQLAlchemy model
+│   │   ├── record.py             # FinancialRecord SQLAlchemy model
+│   │   └── refresh_token.py      # RefreshToken SQLAlchemy model
+│   ├── schemas/
+│   │   ├── user.py               # User request/response Pydantic schemas
+│   │   ├── record.py             # Record request/response Pydantic schemas
+│   │   └── token.py              # Token response schema
+│   ├── routers/
+│   │   ├── auth.py               # Authentication endpoints
+│   │   ├── users.py              # User management endpoints
+│   │   ├── records.py            # Financial record endpoints
+│   │   └── dashboard.py          # Analytics and summary endpoints
+│   ├── services/
+│   │   ├── auth_service.py       # Auth business logic
+│   │   ├── user_service.py       # User management business logic
+│   │   ├── record_service.py     # Record CRUD business logic
+│   │   └── dashboard_service.py  # Aggregation and analytics logic
+│   ├── database.py               # Async SQLAlchemy engine, session and base
+│   └── main.py                   # FastAPI app entry point
+├── alembic/                      # Database migration files
+├── seed.py                       # Creates initial admin user in DB
+├── docker-compose.yml            # PostgreSQL container configuration
+├── requirements.txt              # Python dependencies
+├── .env.example                  # Environment variable template
+└── README.md
 ---
 
 ## Setup Instructions
