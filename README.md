@@ -1,4 +1,4 @@
-# Finance Backend API
+# Zorvyn Backend API
 
 A well-structured REST API for a finance dashboard system with role-based access control, financial record management, and aggregated analytics.
 
