@@ -6,8 +6,11 @@ from app.schemas.record import RecordCreate, RecordUpdate, RecordFilter, RecordR
 from app.services.record_service import create_record, get_records, get_record_by_id, restore_record, update_record, delete_record
 from app.core.dependencies import get_current_admin, get_current_analyst_or_admin
 
+
 router = APIRouter(prefix="/records", tags=["Records"])
 
+
+from fastapi import Query
 
 @router.get("/", response_model=list[RecordResponse])
 async def list_records(
@@ -16,12 +19,20 @@ async def list_records(
     date_from: str | None = None,
     date_to: str | None = None,
     search: str | None = None,
-    page: int = 1,
-    limit: int = 10,
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_analyst_or_admin)
 ):
-    filters = RecordFilter(type=type, category=category, date_from=date_from, date_to=date_to, search=search, page=page, limit=limit)
+    filters = RecordFilter(
+        type=type,
+        category=category,
+        date_from=date_from,
+        date_to=date_to,
+        search=search,
+        page=page,
+        limit=limit
+    )
     return await get_records(db, filters)
 
 
