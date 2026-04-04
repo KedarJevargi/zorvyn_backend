@@ -300,8 +300,10 @@ GET /dashboard/recent?limit=5
 ## Request / Response Examples
 
 ### Register
-```
+```json
 POST /auth/register
+
+Request:
 {
   "name": "Rahul Sharma",
   "email": "rahul@example.com",
@@ -322,8 +324,10 @@ Response 201:
 ```
 
 ### Login
-```
+```json
 POST /auth/login
+
+Request:
 {
   "email": "admin@finance.com",
   "password": "admin123"
@@ -334,13 +338,15 @@ Response 200:
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "token_type": "bearer"
 }
-# refresh_token set as HttpOnly cookie
 ```
+> refresh_token is set as HttpOnly cookie — not visible in response body
 
 ### Create Record
-```
+```json
 POST /records
 Authorization: Bearer <access_token>
+
+Request:
 {
   "amount": 50000,
   "type": "income",
@@ -363,6 +369,36 @@ Response 201:
   "updated_at": "2026-04-03T10:00:00Z"
 }
 ```
+
+### Dashboard Summary
+```json
+GET /dashboard/summary?date_from=2026-01-01T00:00:00Z&date_to=2026-03-31T00:00:00Z
+Authorization: Bearer <access_token>
+
+Response 200:
+{
+  "total_income": 85000.00,
+  "total_expenses": 11500.00,
+  "net_balance": 73500.00
+}
+```
+
+### Error Responses
+```json
+POST /records (as Analyst)
+Response 403:
+{
+  "detail": "Insufficient permissions"
+}
+
+POST /auth/login (wrong password)
+Response 401:
+{
+  "detail": "Invalid credentials"
+}
+```
+
+> For complete interactive documentation with all request/response schemas visit Swagger UI at `http://localhost:8000/docs`
 
 ### Dashboard Summary
 ```
@@ -550,6 +586,8 @@ Data model is simple and relational, not deeply nested or multi-client. REST map
 ---
 
 ## API Documentation
+
+
 
 Interactive Swagger UI: `http://localhost:8000/docs`
 
