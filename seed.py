@@ -17,7 +17,7 @@ async def seed():
         
         admin = User(
             name="Admin",
-            email="admin@finance.com",
+            email="admin@zorvyn.com",
             hashed_password=hash_password("admin123"),
             role=UserRole.admin
         )
