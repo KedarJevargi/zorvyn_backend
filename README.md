@@ -60,7 +60,7 @@ app/
 
 ### 1. Clone the repository
 ```bash
-git clone <repo-url>
+git clone <https://github.com/KedarJevargi/zorvyn_backend.git>
 cd backend
 ```
 
@@ -68,7 +68,7 @@ cd backend
 
 **Mac/Linux:**
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate
 ```
 
