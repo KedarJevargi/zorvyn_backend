@@ -595,6 +595,9 @@ Data model is simple and relational, not deeply nested or multi-client. REST map
 - Redis caching for dashboard aggregation queries
 - Full Text Search for notes field
 - Docker Compose for full stack deployment
+- Integrate AI-powered insights on dashboard — use an LLM to automatically summarize spending patterns, flag unusual transactions, or suggest budget optimizations based on financial record trends
+- Add anomaly detection for financial records using ML to identify suspicious entries
+- Natural language query support — allow analysts to ask questions like "show me all expenses above 10000 in Q1" instead of manually building filters
 
 ---
 
