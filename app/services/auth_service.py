@@ -13,6 +13,7 @@ from app.core.security import (
 
 
 async def register_user(db: AsyncSession, data: UserRegister) -> User:
+    """Register a new user with viewer role by default."""
     result = await db.execute(select(User).where(User.email == data.email))
     if result.scalar_one_or_none():
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
@@ -29,6 +30,7 @@ async def register_user(db: AsyncSession, data: UserRegister) -> User:
 
 
 async def login_user(db: AsyncSession, data: UserLogin) -> dict:
+    """Authenticate user credentials and return access + refresh tokens."""
     result = await db.execute(
         select(User).where(User.email == data.email, User.is_deleted == False, User.is_active == True)
     )
@@ -58,6 +60,7 @@ async def login_user(db: AsyncSession, data: UserLogin) -> dict:
 
 
 async def refresh_access_token(db: AsyncSession, refresh_token: str) -> TokenResponse:
+    """Issue a new access token using a valid refresh token."""
     try:
         payload = decode_token(refresh_token)
         if payload.get("type") != "refresh":
@@ -81,6 +84,7 @@ async def refresh_access_token(db: AsyncSession, refresh_token: str) -> TokenRes
 
 
 async def logout_user(db: AsyncSession, refresh_token: str) -> None:
+    """Revoke the refresh token to invalidate the session."""
     result = await db.execute(
         select(RefreshToken).where(RefreshToken.token == refresh_token)
     )

@@ -6,6 +6,7 @@ from app.models.record import RecordType
 
 
 class RecordCreate(BaseModel):
+    """Schema for creating a new financial record."""
     amount: Decimal
     type: RecordType
     category: str
@@ -24,6 +25,7 @@ class RecordCreate(BaseModel):
 
 
 class RecordUpdate(BaseModel):
+    """Schema for partially updating a financial record. All fields optional."""
     amount: Optional[Decimal] = None
     type: Optional[RecordType] = None
     category: Optional[str] = None
@@ -36,6 +38,7 @@ class RecordUpdate(BaseModel):
 
 
 class RecordResponse(BaseModel):
+    """Schema for returning financial record data in API responses."""
     id: int
     user_id: int
     amount: Decimal
@@ -53,6 +56,7 @@ class RecordResponse(BaseModel):
 
 
 class RecordFilter(BaseModel):
+    """Query parameters for filtering and paginating financial records."""
     type: Optional[RecordType] = None
     category: Optional[str] = None
     date_from: Optional[datetime] = None

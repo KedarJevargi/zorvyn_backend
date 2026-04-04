@@ -8,6 +8,7 @@ from app.schemas.record import RecordCreate, RecordUpdate, RecordFilter
 
 
 async def create_record(db: AsyncSession, data: RecordCreate, user_id: int) -> FinancialRecord:
+    """Create a new financial record assigned to the given user."""
     record = FinancialRecord(
         user_id=user_id,
         amount=data.amount,
@@ -23,6 +24,7 @@ async def create_record(db: AsyncSession, data: RecordCreate, user_id: int) -> F
 
 
 async def get_records(db: AsyncSession, filters: RecordFilter) -> list[FinancialRecord]:
+    """Fetch paginated financial records with optional filtering by type, category, date and notes search."""
     query = select(FinancialRecord).where(FinancialRecord.is_deleted == False)
     
     if filters.type:
@@ -44,6 +46,7 @@ async def get_records(db: AsyncSession, filters: RecordFilter) -> list[Financial
 
 
 async def get_record_by_id(db: AsyncSession, record_id: int) -> FinancialRecord:
+    """Fetch a single financial record by ID. Raises 404 if not found or soft deleted."""
     result = await db.execute(
         select(FinancialRecord).where(
             FinancialRecord.id == record_id,
@@ -57,6 +60,7 @@ async def get_record_by_id(db: AsyncSession, record_id: int) -> FinancialRecord:
 
 
 async def update_record(db: AsyncSession, record_id: int, data: RecordUpdate) -> FinancialRecord:
+    """Partially update a financial record by ID."""
     record = await get_record_by_id(db, record_id)
     
     if data.amount is not None:
@@ -76,12 +80,14 @@ async def update_record(db: AsyncSession, record_id: int, data: RecordUpdate) ->
 
 
 async def delete_record(db: AsyncSession, record_id: int) -> None:
+    """Soft delete a financial record by setting is_deleted=True."""
     record = await get_record_by_id(db, record_id)
     record.is_deleted = True
     record.deleted_at = datetime.now(timezone.utc)
     await db.commit()
 
 async def restore_record(db: AsyncSession, record_id: int) -> FinancialRecord:
+    """Restore a soft deleted financial record."""
     result = await db.execute(
         select(FinancialRecord).where(
             FinancialRecord.id == record_id,

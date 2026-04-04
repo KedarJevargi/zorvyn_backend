@@ -9,6 +9,7 @@ async def get_summary(
     date_from: datetime | None = None,
     date_to: datetime | None = None
 ) -> dict:
+    """Return total income, expenses and net balance with optional date range filter."""
     query = select(
         func.coalesce(func.sum(FinancialRecord.amount).filter(FinancialRecord.type == RecordType.income), 0).label("total_income"),
         func.coalesce(func.sum(FinancialRecord.amount).filter(FinancialRecord.type == RecordType.expense), 0).label("total_expenses"),
@@ -33,6 +34,7 @@ async def get_category_totals(
     date_from: datetime | None = None,
     date_to: datetime | None = None
 ) -> list[dict]:
+    """Return total amounts grouped by category and type with optional date range filter."""
     query = select(
         FinancialRecord.category,
         FinancialRecord.type,
@@ -55,6 +57,7 @@ async def get_trends(
     date_from: datetime | None = None,
     date_to: datetime | None = None
 ) -> list[dict]:
+    """Return income and expense trends grouped by monthly or weekly periods."""
     trunc = func.date_trunc("month" if period == "monthly" else "week", FinancialRecord.date)
 
     query = select(
@@ -79,6 +82,7 @@ async def get_recent_activity(
     date_from: datetime | None = None,
     date_to: datetime | None = None
 ) -> list[FinancialRecord]:
+    """Return the most recent financial records ordered by creation date."""
     query = select(FinancialRecord).where(FinancialRecord.is_deleted == False)
 
     if date_from:

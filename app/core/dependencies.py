@@ -12,6 +12,7 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: AsyncSession = Depends(get_db)
 ) -> User:
+    """Extract and validate JWT token, return the authenticated user."""
     try:
         payload = decode_token(credentials.credentials)
         if payload.get("type") != "access":
@@ -35,7 +36,13 @@ async def get_current_user(
     return user
 
 def require_role(*roles: UserRole):
+    """Factory that returns a dependency enforcing role-based access control.
+    
+    Usage: Depends(require_role(UserRole.admin))
+    Returns 403 if the current user's role is not in the allowed roles.
+    """
     async def dependency(current_user: User = Depends(get_current_user)) -> User:
+        """Check if authenticated user has one of the required roles."""
         if current_user.role not in roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
