@@ -7,7 +7,7 @@ from app.routers.records import router as records_router
 from app.routers.dashboard import router as dashboard_router
 
 app = FastAPI(
-    title="Finance Backend API",
+    title="Zorvyn Backend API",
     description="""
     A finance dashboard backend supporting role-based access control,
     financial record management, and aggregated analytics.
