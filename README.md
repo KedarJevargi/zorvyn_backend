@@ -10,19 +10,33 @@ Built with **FastAPI**, **PostgreSQL**, and **SQLAlchemy 2.0**.
 
 ## System Architecture
 ```
-Client
+Client (Swagger UI / Frontend)
   │
+  │  HTTP Request + Bearer Token
   ▼
 FastAPI (Routers)
+  │
+  ├── JWT Middleware (authentication)
+  ├── Role Guard (authorization)
+  └── Pydantic Validation (input validation)
   │
   ▼
 Services (Business Logic)
   │
-  ▼
-SQLAlchemy ORM
+  ├── auth_service.py
+  ├── user_service.py
+  ├── record_service.py
+  └── dashboard_service.py
   │
   ▼
-PostgreSQL (Docker)
+SQLAlchemy ORM (Async)
+  │
+  ▼
+PostgreSQL (Docker Container)
+  │
+  ├── users
+  ├── financial_records
+  └── refresh_tokens
 ```
 
 ---
