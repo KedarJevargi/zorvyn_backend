@@ -244,8 +244,8 @@ User (1) ──────────── (many) RefreshToken
 | Method | Endpoint | Description | Auth |
 |---|---|---|---|
 | POST | /records | Create financial record | Admin |
-| GET | /records | List records with filters, search and pagination | Analyst+ |
-| GET | /records/{id} | Get single record | Analyst+ |
+| GET | /records | List records with filters, search and pagination | Analyst+Admin |
+| GET | /records/{id} | Get single record | Analyst+Admin|
 | PATCH | /records/{id} | Update record | Admin |
 | DELETE | /records/{id} | Soft delete record | Admin |
 | PATCH | /records/{id}/restore | Restore soft deleted record | Admin |
