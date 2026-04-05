@@ -342,7 +342,7 @@ POST /auth/login
 
 Request:
 {
-  "email": "admin@finance.com",
+  "email": "admin@zorvyn.com",
   "password": "admin123"
 }
 
