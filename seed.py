@@ -10,7 +10,7 @@ from app.models import user, record, refresh_token  # noqa: F401
 async def seed():
     async with async_session() as db:
         # check if admin already exists
-        result = await db.execute(select(User).where(User.email == "admin@finance.com"))
+        result = await db.execute(select(User).where(User.email == "admin@zorvyn.com"))
         if result.scalar_one_or_none():
             print("Admin already exists")
             return
