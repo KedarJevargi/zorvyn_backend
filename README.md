@@ -58,7 +58,7 @@ PostgreSQL (Docker Container)
 
 ## Project Structure
 ```
-finance-backend/
+zorvyn_backend/
 ├── app/
 │   ├── core/
 │   │   ├── config.py           # Environment configuration via Pydantic Settings
