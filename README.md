@@ -562,7 +562,7 @@ Data model is simple and relational, not deeply nested or multi-client. REST map
 
 ## Assumptions
 
-- Only admins create financial records — Analysts and Viewers are consumers of data
+
 - Category is free-text — no predefined list, normalized to lowercase
 - Soft deleted users cannot login even with a valid JWT token
 - Dashboard endpoints are accessible to all authenticated users including Viewers
