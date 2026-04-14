@@ -1,4 +1,4 @@
-# Zorvyn Backend API
+# Backend API
 
 A well-structured REST API for a finance dashboard system with role-based access control, financial record management, and aggregated analytics.
 
@@ -157,7 +157,7 @@ http://localhost:8000/docs
 
 ### Default Admin Credentials
 ```
-Email:    admin@zorvyn.com
+Email:    admin@company.com
 Password: admin123
 ```
 
