@@ -10,14 +10,14 @@ from app.models import user, record, refresh_token  # noqa: F401
 async def seed():
     async with async_session() as db:
         # check if admin already exists
-        result = await db.execute(select(User).where(User.email == "admin@zorvyn.com"))
+        result = await db.execute(select(User).where(User.email == "admin@company.com"))
         if result.scalar_one_or_none():
             print("Admin already exists")
             return
         
         admin = User(
             name="Admin",
-            email="admin@zorvyn.com",
+            email="admin@company.com",
             hashed_password=hash_password("admin123"),
             role=UserRole.admin
         )
